@@ -1,3 +1,4 @@
+import 'package:WeCare/authentication/model/experience_model.dart';
 import 'package:WeCare/authentication/model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:WeCare/authentication/view/widgets/login_class.dart';
@@ -9,10 +10,11 @@ void main() async{
   runApp(const MyApp());
   await Hive.initFlutter();
   Hive.registerAdapter(UserAdapter());
+  Hive.registerAdapter(ExperienceAdapter());
   await Hive.openBox<User>('userDetailsBox');
+  await Hive.openBox<Experience>('sharingDetailsBox');
   await Hive.openBox('mailBox');
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override

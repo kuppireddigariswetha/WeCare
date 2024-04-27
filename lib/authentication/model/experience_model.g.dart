@@ -19,17 +19,23 @@ class ExperienceAdapter extends TypeAdapter<Experience> {
     return Experience(
       question: fields[0] as String,
       answer: fields[1] as String,
+      Uint8List: fields[2] as dynamic,
+      user: fields[3] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, Experience obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.question)
       ..writeByte(1)
-      ..write(obj.answer);
+      ..write(obj.answer)
+      ..writeByte(2)
+      ..write(obj.Uint8List)
+      ..writeByte(3)
+      ..write(obj.user);
   }
 
   @override

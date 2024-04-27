@@ -40,6 +40,7 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   shared_preferences: ^2.2.2
+  image_picker:
 
 dev_dependencies:
   flutter_test:
@@ -68,6 +69,8 @@ flutter:
   uses-material-design: true
   assets:
      - assets/
+     - assets/yoga/
+     - assets/yoga/mudras/
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

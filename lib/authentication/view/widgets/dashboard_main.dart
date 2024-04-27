@@ -3,6 +3,7 @@ import 'package:WeCare/authentication/model/categories_main_model.dart';
 import 'package:WeCare/authentication/view/widgets/profile_view.dart';
 import 'package:WeCare/authentication/view/widgets/rich_text.dart';
 import 'package:WeCare/authentication/view/widgets/sharing_experience.dart';
+import 'package:WeCare/wellness/view/screens/wellness_activities.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -206,8 +207,13 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                                       SharingExperience()
                                   ),
                                 );
+                              }else if(index ==1){
+                                Navigator.push(context,
+                                  MaterialPageRoute(builder: (c) =>
+                                      WellnessActivities()
+                                  ),
+                                );
                               }
-
                             },
                             child: Container(
                               padding: EdgeInsets.all(16),

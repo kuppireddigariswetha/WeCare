@@ -1,5 +1,11 @@
+import 'dart:io';
+
 import 'package:WeCare/authentication/view/widgets/dashboard_main.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../model/experience_model.dart';
 class SharingExperience extends StatefulWidget {
@@ -10,13 +16,183 @@ class SharingExperience extends StatefulWidget {
 }
 
 class _SharingExperienceState extends State<SharingExperience> {
-  List<Experience> getSharings = [Experience(question: 'Why do I get sick?', answer: 'When you get sick, part or all of your body is not working as it should. The cause of sickness can come from inside your body or from the outside world'),
-    Experience(question: ' Which dimension of wellness relates to having a sense of purpose and inner peace, often achieved through meditation, mindfulness, or religious practices?', answer: 'Spiritual Wellness'),
-    Experience(question: ' Adequate financial planning, budgeting, and being financially stable are associated with which dimension of wellness?', answer: 'Financial Wellness'),
-    Experience(question: ' Which dimension of wellness involves being aware of and appreciating cultural diversity and inclusivity?', answer: 'Cultural Wellness'),
-    Experience(question: ' What is the recommended amount of physical activity for adults, as per the World Health Organization (WHO)?', answer: '2.5 hours per week'),
-    Experience(question: ' Which dimension of wellness involves taking care of the environment and practicing sustainable habits?', answer: 'Spiritual Wellness'),
-    Experience(question: ' How can individuals promote social wellness?', answer: 'By building strong relationships and support networks')];
+  var box = Hive.box<Experience>('sharingDetailsBox');
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  List<Experience> getSharingExp = [];
+  int currentPage = 0;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+  var kAnimationDuration = const Duration(milliseconds: 200);
+  var kPrimaryColor = Colors.black;
+  List<String> getQuotes = ['DO YOGA - COMMUNE WITH NATURE','WE CARE FOR WELLNESS','TURN YOUR IDEAS INTO REALITY','JUST DO GOOD - GOOD THINGS WILL COME BACK TO YOU'];
+
+  AnimatedContainer buildDot(bool isCurrent) {
+    return AnimatedContainer(
+      duration: kAnimationDuration,
+      margin: const EdgeInsets.only(right: 5),
+      height: 8,
+      width: 8,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: isCurrent ? const Color(0xff525252) : const Color(0xffC4C4C4),
+      ),
+    );
+  }
+  void _showModalBottomSheet(BuildContext context) {
+     TextEditingController titleController = TextEditingController();
+     TextEditingController descriptionController = TextEditingController();
+     final ImagePicker _picker = ImagePicker();
+     Uint8List? imageUint8List;
+     XFile? _image;
+     showModalBottomSheet(
+      context: context,
+      builder: (BuildContext bc) {
+        return StatefulBuilder(builder: (context,state){
+          return Container(
+            padding: EdgeInsets.all(20.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  TextFormField(
+                    controller: titleController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter some text';
+                      }else if(value.length>=250){
+                        return 'Title should be less then 250 characters';
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Title here',
+                    ),
+                  ),
+                  SizedBox(height: 10,),
+                  TextFormField(
+                    controller: descriptionController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter description';
+                      }
+                      return null;
+                    },
+                    maxLines: null,
+
+                    decoration: InputDecoration(
+                        hintText: 'Description here',
+                        floatingLabelBehavior: FloatingLabelBehavior.auto
+                    ),
+                  ),
+                  SizedBox(height: 10,),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Center(
+                        child: _image == null
+                            ? const Text('No image selected.')
+                            : Container(
+                            height: 50,
+                            width: 100,
+                            child: Image.file(File(_image!.path))),
+                      ),
+                      InkWell(
+                          onTap: () async{
+                            final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+                            List<int> imageBytes = await image!.readAsBytes();
+                            imageUint8List = Uint8List.fromList(imageBytes);
+                            state(() {
+                              _image = image;
+                            });
+                          },
+                          child: Icon(Icons.image_outlined))
+                    ],
+                  ),
+                  InkWell(
+                    onTap: ()
+                    async{
+                      SharedPreferences pref = await SharedPreferences.getInstance();
+                      String getUserName =  pref.getString('userName')??'';
+                      final isValidated =  _formKey.currentState!.validate();
+                      if(isValidated) {
+                        var sharingData = Experience(question: titleController.text, answer: descriptionController.text, Uint8List:  imageUint8List, user: getUserName);
+                        await box.add(sharingData);
+                        Navigator.pop(context);
+          }else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to save - Try Again')),
+            );
+          }
+
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Container(
+                        width: 150,
+                        height: 50,
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 2),
+                        decoration: BoxDecoration(
+                            borderRadius:
+                            const BorderRadius.all(Radius.circular(8)),
+                            gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Color(0xFF8A3FFC),
+                                  Colors.blue,
+                                ])),
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(6)),
+                            color: Colors.white,
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                              'SAVE',
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: 'Lato'
+                              )
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Padding(
+                  //   padding: const EdgeInsets.all(10.0),
+                  //   child: ElevatedButton(
+                  //     child: Text('Submit'),
+                  //     onPressed: () {
+                  //       if (_formKey.currentState!.validate()) {
+                  //         // If the form is valid, display a Snackbar.
+                  //         Navigator.pop(context);
+                  //         ScaffoldMessenger.of(context).showSnackBar(
+                  //           SnackBar(content: Text('Processing Data')),
+                  //         );
+                  //       }
+                  //     },
+                  //   ),
+                  // ),
+                ],
+              ),
+            ),
+          );
+
+        });
+
+      },
+    ).then((value) => {
+     setState(() {
+     })
+     });
+  }
   @override
   Widget build(BuildContext context) {
     return  SafeArea(
@@ -29,39 +205,123 @@ class _SharingExperienceState extends State<SharingExperience> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 20,),
+              SizedBox(height: 10),
               Padding(
-                padding: const EdgeInsets.only(left: 20,right: 20),
-                child: Align(alignment: Alignment.topLeft,
-                    child: InkWell(
-                        onTap: (){
+                padding: const EdgeInsets.all(20.0),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 35,
+                      height: 35,
+                      child: IconButton(
+                        visualDensity: VisualDensity.adaptivePlatformDensity,
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: Icon(Icons.arrow_back_ios))),
+                        icon: const Icon(
+                          Icons.chevron_left,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 30,),
+                    Text(
+                      "Set an Example",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.deepPurple,
+                        fontStyle: FontStyle.normal,
+                        fontWeight: FontWeight.w900,
+                        fontFamily: 'Lato'
+                      )
+                    ),
+                  ],
+                ),
               ),
-              Center(child: Image.asset('assets/wellness.jpeg',)),
-              SizedBox(height: 20,),
+              SizedBox(height: 10),
+              Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: SizedBox(
+                    height: 100,
+                    // color: AppColors.grey,
+                    child: Stack(
+                      children: [
+                        PageView.builder(
+                          itemCount: getQuotes.length,
+                          physics: const BouncingScrollPhysics(
+                              parent: AlwaysScrollableScrollPhysics()),
+                          onPageChanged: (index) {
+                            setState(() {
+                              currentPage = index;
+                            });
+                          },
+                          itemBuilder: (c, i) {
+                            return Padding(
+                              padding: const EdgeInsets.only(left: 20,right: 20),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: Colors.transparent,
+                                ),
+                                height: 100,
+                                child: Center(child: Text('${getQuotes[i]}',style: TextStyle(
+                                  fontFamily: 'Lato',fontWeight: FontWeight.bold,fontSize: 20,color: Colors.purple
+                                ),)),
+                              ),
+                            );
+                          },
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: List.generate(
+                                  getQuotes.length,
+                                      (index) => buildDot(index == currentPage),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 11,
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 30),
               Padding(
                 padding: const EdgeInsets.only(left: 20,right: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Sharing Experiences', style: TextStyle(color: Colors.black87,fontSize: 20,fontFamily: 'Lato',fontWeight: FontWeight.w900),),
-                    Card(
-                      color: Colors.deepPurple,
-                      elevation: 5,
-                      child: Container(
-                        width: 80,
-                        height: 35,
-                        alignment: Alignment.center,
-                        decoration: boxDecorationWithRoundedCorners(
-                          borderRadius: BorderRadius.circular(30),
-                          backgroundColor: Colors.deepPurple,
-                        ),
-                        child: Text(
-                          'Post',
-                          maxLines: 1,
-                          style: TextStyle(fontSize: 12, color: Colors.white, fontFamily: 'Lato'),
+                    Text('User Experiences', style: TextStyle(color: Colors.black87,fontSize: 20,fontFamily: 'Lato',fontWeight: FontWeight.w900),),
+                    InkWell(
+                      onTap: (){
+                        _showModalBottomSheet(context);
+                      },
+                      child: Card(
+                        color: Colors.deepPurple,
+                        elevation: 5,
+                        child: Container(
+                          width: 80,
+                          height: 35,
+                          alignment: Alignment.center,
+                          decoration: boxDecorationWithRoundedCorners(
+                            borderRadius: BorderRadius.circular(30),
+                            backgroundColor: Colors.deepPurple,
+                          ),
+                          child: Text(
+                            'Post',
+                            maxLines: 1,
+                            style: TextStyle(fontSize: 12, color: Colors.white, fontFamily: 'Lato'),
+                          ),
                         ),
                       ),
                     ),
@@ -70,44 +330,95 @@ class _SharingExperienceState extends State<SharingExperience> {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: getSharings.length,
+                  itemCount: box.length,
                     itemBuilder: (context, index){
                        return Padding(
-                         padding: const EdgeInsets.only(left: 15,right: 15,top: 8),
-                         child: Card(
-                           elevation: 2,
-                           child: Container(
-                             margin: EdgeInsets.all(10),
-                             child: Column(
-                               crossAxisAlignment: CrossAxisAlignment.start,
-                               children: [
-                                 Row(
-                                   mainAxisAlignment: MainAxisAlignment.start,
+                         padding: const EdgeInsets.only(left: 20,right: 20,top: 10,bottom: 10),
+                         child: SizedBox(
+                           height: 125,
+                           // padding: EdgeInsets.only(left: 11.w),
+                           child: Row(
+                             mainAxisSize: MainAxisSize.max,
+                             // crossAxisAlignment: CrossAxisAlignment.start,
+                             children: [
+                               Center(
+                                 child: ClipRRect(
+                                   borderRadius: BorderRadius.circular(8),
+                                   child: Container(
+                                     width: 125,
+                                     height: 125,
+                                     // margin: EdgeInsets.only(right: 14.w),
+                                     child: box.getAt(index)!.Uint8List == null?Image.asset('assets/blog.png'):
+                                     Image.memory(box.getAt(index)!.Uint8List),
+                                   ),
+                                 ),
+                               ),
+                               Expanded(
+                                 child: Row(
+                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                    children: [
-                                     Text('${index+1}', style: TextStyle(color: Colors.deepPurple,fontFamily: 'Lato',fontSize: 15,fontWeight: FontWeight.w700),),
-                                     SizedBox(width: 10,),
-                                     Container(
-                                       width: MediaQuery.of(context).size.width*0.80,
-                                       child: Text('${getSharings[index].question}',
-                                           maxLines: 10,
-                                           overflow: TextOverflow.ellipsis,
-                                           style: TextStyle(color: Colors.black87,fontFamily: 'Lato',fontSize: 14,fontWeight: FontWeight.w900)),
-                                     )
+                                     Expanded(
+                                       child: Padding(
+                                         padding: EdgeInsets.only(
+                                           left: 15,
+                                           right: 2,
+                                           top: 10,
+                                           bottom: 10,
+                                         ),
+                                         child: Column(
+                                           mainAxisAlignment:
+                                           MainAxisAlignment.start,
+                                           crossAxisAlignment:
+                                           CrossAxisAlignment.start,
+                                           children: [
+                                             Flexible(
+                                               child: Text(
+                                                 "${box.getAt(index)!.question}",
+                                                 style: TextStyle(
+                                                     fontSize: 16,
+                                                     color: Colors.black,
+                                                     fontStyle: FontStyle.normal,
+                                                     fontWeight: FontWeight.w600,
+                                                     fontFamily: 'Lato'
+                                                 ),
+                                                 maxLines: 3,
+                                                 overflow: TextOverflow.ellipsis,
+                                               ),
+                                             ),
+                                             SizedBox(
+                                               height: 8,
+                                             ),
+                                             Text(
+                                               "${box.getAt(index)!.answer}",
+                                               style: TextStyle(
+                                                   fontSize: 14,
+                                                   color: Colors.black,
+                                                   fontStyle: FontStyle.normal,
+                                                   fontWeight: FontWeight.w400,
+                                                   fontFamily: 'Lato'
+                                               ),
+                                               maxLines: 2,
+                                               overflow: TextOverflow.ellipsis,
+                                             ),
+                                             SizedBox(
+                                               height: 8,
+                                             ),
+                                           ],
+                                         ),
+                                       ),
+                                     ),
                                    ],
                                  ),
-
-                                 Padding(
-                                   padding: const EdgeInsets.only(left: 23),
-                                   child: Text('${getSharings[index].answer}',style: TextStyle(color: Colors.grey,fontFamily: 'Lato',fontSize: 18,fontWeight: FontWeight.w600)),
-                                 )
-                               ],
-                             ),
+                               )
+                             ],
                            ),
                          ),
                        );
                     }
                 ),
-              )
+              ),
+
             ],
           ),
         ),
