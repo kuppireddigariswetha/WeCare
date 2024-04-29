@@ -201,9 +201,9 @@ class _SharingExperienceState extends State<SharingExperience> {
   }
   @override
   Widget build(BuildContext context) {
-    return  SafeArea(
-      child:  Scaffold(
-        body: Container(
+    return  Scaffold(
+      body: SafeArea(
+        child: Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
