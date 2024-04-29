@@ -232,7 +232,7 @@ class _SharingExperienceState extends State<SharingExperience> {
                     ),
                     SizedBox(width: 30,),
                     Text(
-                      "Set an Example",
+                      "SET AN EXAMPLE",
                       style: TextStyle(
                         fontSize: 20,
                         color: Colors.deepPurple,

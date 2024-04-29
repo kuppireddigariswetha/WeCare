@@ -17,7 +17,7 @@ class _WellnessActivitiesState extends State<WellnessActivities> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         centerTitle: false,
-        title: Text("Wellness For You",style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600,fontFamily: 'Lato', color: Colors.deepPurple),),
+        title: Text("WELLNESS FOR YOU",style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900,fontFamily: 'Lato', color: Colors.deepPurple),),
         leading: InkWell(
           onTap: (){
             Navigator.pop(context);

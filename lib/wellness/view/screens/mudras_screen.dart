@@ -36,14 +36,24 @@ class _MudrasScreenState extends State<MudrasScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Mudras',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Lato',
-                        color: Colors.deepPurple,
-                      ),
+                    Row(
+                      children: [
+                        InkWell(
+                            onTap: (){
+                              Navigator.pop(context);
+                            },
+                            child: Icon(Icons.arrow_back_ios_outlined)),
+                        SizedBox(width: 10,),
+                        Text(
+                          'MUDRAS',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                            fontFamily: 'Lato',
+                            color: Colors.deepPurple,
+                          ),
+                        ),
+                      ],
                     ),
                     GestureDetector(
                       onTap: () {
