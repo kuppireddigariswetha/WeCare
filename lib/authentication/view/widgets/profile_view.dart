@@ -25,12 +25,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     email = widget.email;
     getUserDetails();
   }
+
   void getUserDetails(){
     var userBox = Hive.box<User>('userDetailsBox');
     var loggedInUser = userBox.get(email);
     phoneNumber = loggedInUser!.mobileNumber;
     hobbies = loggedInUser.hobbies;
   }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(

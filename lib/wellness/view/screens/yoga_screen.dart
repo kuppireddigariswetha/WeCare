@@ -19,12 +19,13 @@ class _YogaScreenState extends State<YogaScreen> {
     const oneSecond = Duration(seconds: 1);
     _periodicTimer = Timer.periodic(oneSecond, (Timer timer) {
       setState(() {
+        setTimer = true;
         if(_tickCount == _stopCount){
           print('Printing 12');
           _periodicTimer?.cancel();
+          setTimer = false;
         }else{
           print('Printing 12');
-            print('Printing 14');
             _tickCount++;
 
         }
@@ -92,11 +93,15 @@ class _YogaScreenState extends State<YogaScreen> {
                   onTap: (){
                     print('Printing 11');
                       print('Printing 17');
-                      _tickCount == 0;
-                      // setState(() {
-                      //   setTimer == true;
-                      // });
-                      _startPeriodicTimer();
+                      if(setTimer == false){
+                        print('Function Callled');
+                        _tickCount = 0;
+                        // setState(() {
+                        //   setTimer == true;
+                        // });
+                        _startPeriodicTimer();
+                      }
+
 
                   },
                   child: Container(
