@@ -51,136 +51,142 @@ class _SharingExperienceState extends State<SharingExperience> {
       context: context,
       builder: (BuildContext bc) {
         return StatefulBuilder(builder: (context,state){
-          return Container(
-            padding: EdgeInsets.all(20.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  TextFormField(
-                    controller: titleController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
-                      }else if(value.length>=250){
-                        return 'Title should be less then 250 characters';
-                      }
-                      return null;
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Title here',
-                    ),
-                  ),
-                  SizedBox(height: 10,),
-                  TextFormField(
-                    controller: descriptionController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter description';
-                      }
-                      return null;
-                    },
-                    maxLines: null,
+          return Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.all(20.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      TextFormField(
+                        controller: titleController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter some text';
+                          }else if(value.length>=250){
+                            return 'Title should be less then 250 characters';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Title here',
+                        ),
+                      ),
+                      SizedBox(height: 10,),
+                      TextFormField(
+                        controller: descriptionController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter description';
+                          }
+                          return null;
+                        },
+                        maxLines: null,
 
-                    decoration: InputDecoration(
-                        hintText: 'Description here',
-                        floatingLabelBehavior: FloatingLabelBehavior.auto
-                    ),
-                  ),
-                  SizedBox(height: 10,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Center(
-                        child: _image == null
-                            ? const Text('No image selected.')
-                            : Container(
-                            height: 50,
-                            width: 100,
-                            child: Image.file(File(_image!.path))),
+                        decoration: InputDecoration(
+                            hintText: 'Description here',
+                            floatingLabelBehavior: FloatingLabelBehavior.auto
+                        ),
+                      ),
+                      SizedBox(height: 10,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Center(
+                            child: _image == null
+                                ? const Text('No image selected.')
+                                : Container(
+                                height: 50,
+                                width: 100,
+                                child: Image.file(File(_image!.path))),
+                          ),
+                          InkWell(
+                              onTap: () async{
+                                FocusScope.of(context).requestFocus(FocusNode());
+                                final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+                                List<int> imageBytes = await image!.readAsBytes();
+                                imageUint8List = Uint8List.fromList(imageBytes);
+                                state(() {
+                                  _image = image;
+                                });
+                              },
+                              child: Icon(Icons.image_outlined))
+                        ],
                       ),
                       InkWell(
-                          onTap: () async{
-                            final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-                            List<int> imageBytes = await image!.readAsBytes();
-                            imageUint8List = Uint8List.fromList(imageBytes);
-                            state(() {
-                              _image = image;
-                            });
-                          },
-                          child: Icon(Icons.image_outlined))
-                    ],
-                  ),
-                  InkWell(
-                    onTap: ()
-                    async{
-                      SharedPreferences pref = await SharedPreferences.getInstance();
-                      String getUserName =  pref.getString('userName')??'';
-                      final isValidated =  _formKey.currentState!.validate();
-                      if(isValidated) {
-                        var sharingData = Experience(question: titleController.text, answer: descriptionController.text, Uint8List:  imageUint8List, user: getUserName);
-                        await box.add(sharingData);
-                        Navigator.pop(context);
-          }else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Failed to save - Try Again')),
-            );
-          }
+                        onTap: ()
+                        async{
+                          SharedPreferences pref = await SharedPreferences.getInstance();
+                          String getUserName =  pref.getString('userName')??'';
+                          final isValidated =  _formKey.currentState!.validate();
+                          if(isValidated) {
+                            var sharingData = Experience(question: titleController.text, answer: descriptionController.text, Uint8List:  imageUint8List, user: getUserName);
+                            await box.add(sharingData);
+                            Navigator.pop(context);
+              }else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Failed to save - Try Again')),
+                );
+              }
 
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Container(
-                        width: 150,
-                        height: 50,
-                        alignment: Alignment.center,
-                        padding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 2),
-                        decoration: BoxDecoration(
-                            borderRadius:
-                            const BorderRadius.all(Radius.circular(8)),
-                            gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Color(0xFF8A3FFC),
-                                  Colors.blue,
-                                ])),
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(6)),
-                            color: Colors.white,
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                              'SAVE',
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  fontFamily: 'Lato'
-                              )
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Container(
+                            width: 150,
+                            height: 50,
+                            alignment: Alignment.center,
+                            padding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 2),
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
+                                gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Color(0xFF8A3FFC),
+                                      Colors.blue,
+                                    ])),
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                borderRadius: BorderRadius.all(Radius.circular(6)),
+                                color: Colors.white,
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                  'SAVE',
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      fontFamily: 'Lato'
+                                  )
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                      // Padding(
+                      //   padding: const EdgeInsets.all(10.0),
+                      //   child: ElevatedButton(
+                      //     child: Text('Submit'),
+                      //     onPressed: () {
+                      //       if (_formKey.currentState!.validate()) {
+                      //         // If the form is valid, display a Snackbar.
+                      //         Navigator.pop(context);
+                      //         ScaffoldMessenger.of(context).showSnackBar(
+                      //           SnackBar(content: Text('Processing Data')),
+                      //         );
+                      //       }
+                      //     },
+                      //   ),
+                      // ),
+                    ],
                   ),
-                  // Padding(
-                  //   padding: const EdgeInsets.all(10.0),
-                  //   child: ElevatedButton(
-                  //     child: Text('Submit'),
-                  //     onPressed: () {
-                  //       if (_formKey.currentState!.validate()) {
-                  //         // If the form is valid, display a Snackbar.
-                  //         Navigator.pop(context);
-                  //         ScaffoldMessenger.of(context).showSnackBar(
-                  //           SnackBar(content: Text('Processing Data')),
-                  //         );
-                  //       }
-                  //     },
-                  //   ),
-                  // ),
-                ],
+                ),
               ),
             ),
           );
@@ -205,7 +211,6 @@ class _SharingExperienceState extends State<SharingExperience> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Row(
