@@ -1,27 +1,25 @@
-import 'package:WeCare/wellness/view/screens/mudras_screen.dart';
-import 'package:WeCare/wellness/view/screens/yoga_screen.dart';
+import 'package:WeCare/gaming/view/screens/activities_screen.dart';
 import 'package:flutter/material.dart';
-class WellnessActivities extends StatefulWidget {
-  const WellnessActivities({super.key});
+class GamingWellness extends StatefulWidget {
+  const GamingWellness({super.key});
 
   @override
-  State<WellnessActivities> createState() => _WellnessActivitiesState();
+  State<GamingWellness> createState() => _GamingWellnessState();
 }
 
-class _WellnessActivitiesState extends State<WellnessActivities> {
-
+class _GamingWellnessState extends State<GamingWellness> {
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         centerTitle: false,
-        title: Text("WELLNESS FOR YOU",style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900,fontFamily: 'Lato', color: Colors.deepPurple),),
+        title: Text("EXPRESSIVE GAMIFICATION",style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900,fontFamily: 'Lato', color: Colors.deepPurple),),
         leading: InkWell(
-          onTap: (){
-            Navigator.pop(context);
-          },
+            onTap: (){
+              Navigator.pop(context);
+            },
             child: Icon(Icons.arrow_back_ios_new_outlined)),
       ),
       body: Container(
@@ -41,34 +39,43 @@ class _WellnessActivitiesState extends State<WellnessActivities> {
             const SizedBox(height: 10,),
             InkWell(
               onTap: (){
-                Navigator.push(context,
-                  MaterialPageRoute(builder: (c) =>
-                      YogaScreen()
-                  ),
-                );
+
               },
               child: Cards(
-                image: AssetImage('assets/yoga/yoga.jpg'),
-                title: 'YOGA',
+                image: AssetImage('assets/yoga/healing.jpg'),
+                title: 'HEALING WITH MUSIC',
               ),
-            ),
-            const SizedBox(height: 10,),
-            Cards(
-              image: AssetImage('assets/yoga/dance_fit.jpg'),
-              title: 'DANCE/FITNESS',
             ),
             const SizedBox(height: 10,),
             InkWell(
               onTap: (){
                 Navigator.push(context,
                   MaterialPageRoute(builder: (c) =>
-                      MudrasScreen()
+                      GamingActivities()
                   ),
                 );
               },
               child: Cards(
-                image: AssetImage('assets/yoga/mudra.jpg'),
-                title: 'MUDRAS',
+                image: AssetImage('assets/yoga/games-fit.jpg'),
+                title: 'GAMES',
+              ),
+            ),
+            const SizedBox(height: 10,),
+            InkWell(
+              onTap: (){
+              },
+              child: Cards(
+                image: AssetImage('assets/yoga/mandala.jpg'),
+                title: 'MANDALA',
+              ),
+            ),
+            const SizedBox(height: 10,),
+            InkWell(
+              onTap: (){
+              },
+              child: Cards(
+                image: AssetImage('assets/yoga/events.jpg'),
+                title: 'EVENTS / WORKSHOPS',
               ),
             ),
           ],

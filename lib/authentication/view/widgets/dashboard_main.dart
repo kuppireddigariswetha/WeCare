@@ -3,6 +3,8 @@ import 'package:WeCare/authentication/model/categories_main_model.dart';
 import 'package:WeCare/authentication/view/widgets/profile_view.dart';
 import 'package:WeCare/authentication/view/widgets/rich_text.dart';
 import 'package:WeCare/authentication/view/widgets/sharing_experience.dart';
+import 'package:WeCare/gaming/view/screens/gaming_screen.dart';
+import 'package:WeCare/wellness/view/screens/aichat_screen.dart';
 import 'package:WeCare/wellness/view/screens/wellness_activities.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -213,6 +215,14 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                                       WellnessActivities()
                                   ),
                                 );
+                              }else if(index == 3){
+
+                              }if(index == 0){
+                                Navigator.push(context,
+                                  MaterialPageRoute(builder: (c) =>
+                                      GamingWellness()
+                                  ),
+                                );
                               }
                             },
                             child: Container(
@@ -281,18 +291,27 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                           title:Text(
                             'Human in the Loop', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w900, fontSize : 12, fontFamily: 'Lato'),
                           ),
-                          trailing: Container(
-                            width: 80,
-                            height: 35,
-                            alignment: Alignment.center,
-                            decoration: boxDecorationWithRoundedCorners(
-                              borderRadius: BorderRadius.circular(30),
-                              backgroundColor: Colors.white,
-                            ),
-                            child: Text(
-                              'Start',
-                              maxLines: 1,
-                              style: TextStyle(fontSize: 12, color: Colors.black87, fontFamily: 'Lato'),
+                          trailing: InkWell(
+                            onTap: (){
+                              Navigator.push(context,
+                                MaterialPageRoute(builder: (c) =>
+                                    AIChatScreen()
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: 80,
+                              height: 35,
+                              alignment: Alignment.center,
+                              decoration: boxDecorationWithRoundedCorners(
+                                borderRadius: BorderRadius.circular(30),
+                                backgroundColor: Colors.white,
+                              ),
+                              child: Text(
+                                'Start',
+                                maxLines: 1,
+                                style: TextStyle(fontSize: 12, color: Colors.black87, fontFamily: 'Lato'),
+                              ),
                             ),
                           ),
                         ),
